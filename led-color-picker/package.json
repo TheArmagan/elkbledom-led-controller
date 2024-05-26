@@ -1,0 +1,21 @@
+{
+  "name": "led-color-picker",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "color": "^4.2.3",
+    "vue": "^3.4.21",
+    "vue-color-wheel": "^0.1.1",
+    "vue-slider-component": "4.1.0-beta.7"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.4",
+    "vite": "^5.2.8"
+  }
+}
