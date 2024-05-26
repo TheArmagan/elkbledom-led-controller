@@ -28,6 +28,10 @@ noble.on('discover', async (p) => {
     peripheral = p;
     noble.stopScanning();
     await p.connectAsync();
+    p.addListener('disconnect', () => {
+      console.log('disconnected from peripheral: ' + p.uuid);
+      noble.startScanningAsync([], true);
+    });
     await new Promise((resolve) => setTimeout(resolve, 1000));
     console.log('connected to peripheral: ' + p.uuid);
     const { characteristics } = await p.discoverAllServicesAndCharacteristicsAsync();
