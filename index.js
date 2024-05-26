@@ -8,6 +8,8 @@ const _ = require('lodash');
 eApp.use(express.static('./led-color-picker/dist'));
 eApp.listen(3498);
 
+process.title = "Bluetooth LED Controller";
+
 noble.on('stateChange', (state) => {
   if (state === 'poweredOn') {
     noble.startScanningAsync([], true);
