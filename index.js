@@ -62,7 +62,7 @@ function createTrayApp() {
     if (writer) {
       writer.writeAsync(buildColorBuffer(...color), true);
     }
-  }, 25);
+  }, 50);
 
   ipcMain.on("color", (event, color) => {
     writeColor(color);
