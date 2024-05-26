@@ -184,5 +184,6 @@ app.on('window-all-closed', () => {
 });
 
 app.on('before-quit', async () => {
-  await peripheral.disconnectAsync();
+  noble.stopScanning();
+  peripheral.disconnectAsync();
 });
