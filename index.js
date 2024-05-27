@@ -29,10 +29,14 @@ let win;
 
 let lastColor = [0, 0, 0];
 
+let connected = false;
 noble.on('discover', async (p) => {
-  if (p.advertisement.localName.includes("ELK-BLEDOM")) {
+  if (p.advertisement.localName.includes("ELK-BLEDOM") && !connected) {
     peripheral = p;
+    connected = true;
     p.addListener('disconnect', () => {
+      if (!connected) return;
+      connected = false;
       noble.removeAllListeners("disconnect");
       console.log('disconnected from peripheral: ' + p.uuid);
       noble.startScanningAsync([], true);
