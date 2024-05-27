@@ -10,6 +10,7 @@
   "author": "Kıraç Armağan Önal",
   "license": "GPL-3.0-only",
   "dependencies": {
+    "color": "^4.2.3",
     "electron": "^30.0.8",
     "express": "^4.19.2",
     "lodash": "^4.17.21"

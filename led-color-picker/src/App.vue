@@ -1,5 +1,5 @@
 <script setup>
-  import color from 'color';
+  import Color from 'color';
   import { ref } from 'vue'
   import { VueColorWheel } from 'vue-color-wheel'
   import VueSlider from 'vue-slider-component'
@@ -10,20 +10,16 @@
   const hue = ref(0);
   const saturation = ref(0);
 
-  function sendColor() {
-    API.send("color", color(`hsl(${hue.value}, ${saturation.value}%, ${brightness.value}%)`).rgb().array());
-  }
-
   API.on("color", (color) => {
     wheelColor.value = `rgb(${color.join(', ')})`;
   });
 
-  API.on("brightness", (value) => {
-    brightness.value = value;
-  });
+  function sendColor() {
+    API.send("color", Color(`hsl(${hue.value}, ${saturation.value}%, ${brightness.value}%)`).rgb().array().map((i) => Math.round(i)));
+  }
 
-  function onBrightnessChange(value) {
-    brightness.value = value;
+  function onBrightnessChange(v) {
+    API.emit("brightness", v);
     sendColor();
   }
 
@@ -34,7 +30,7 @@
     sendColor();
   }
 
-  wheelColor.value = "rgb(255, 0, 0)";
+  wheelColor.value = "rgb(0, 0, 0)";
 </script>
 
 <template>
@@ -57,7 +53,7 @@
         :max="100" 
         :tooltipPlacement="['bottom']"
         :marks="[0, 25, 50, 75, 100]"
-        @change="onBrightnessChange" 
+        @change="onBrightnessChange"
       />
     </div>
   </div>

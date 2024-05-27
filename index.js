@@ -5,6 +5,7 @@ const express = require('express');
 const eApp = express();
 const _ = require('lodash');
 const cp = require('child_process');
+const Color = require('color');
 
 eApp.use(express.json());
 eApp.use(express.static('./led-color-picker/dist'));
@@ -28,6 +29,15 @@ let peripheral;
 let win;
 
 let lastColor = [0, 0, 0];
+let _lastColor = [0, 0, 0];
+let brightness = 0;
+
+const writeColor = _.throttle((color) => {
+  lastColor = color;
+  if (writer) {
+    writer.writeAsync(buildColorBuffer(...color), true);
+  }
+}, 50);
 
 let connected = false;
 noble.on('discover', async (p) => {
@@ -63,7 +73,10 @@ audioProc.stdout.on('data', _.throttle((data) => {
     /** @type {number[]} */
     const fftData = data.trim().split(", ").map(Number);
     const bass = Math.floor(fftData.slice(4, 34).reduce((a, b) => a + b, 0) / 30) / 100;
-    win.webContents.send("brightness", 5 + Math.min(bass * 45, 45));
+
+    let brightness = 5 + Math.min(bass * 45, 45);
+    writeColor(Color(_lastColor).lightness(brightness).rgb().array());
+    win.webContents.send("brightness", brightness);
   }
 }, 50));
 
@@ -82,12 +95,7 @@ function createTrayApp() {
     }
   });
 
-  const writeColor = _.throttle((color) => {
-    lastColor = color;
-    if (writer) {
-      writer.writeAsync(buildColorBuffer(...color), true);
-    }
-  }, 50);
+
 
   eApp.get('/color', (req, res) => {
     res.send({ color: lastColor });
@@ -100,7 +108,12 @@ function createTrayApp() {
   });
 
   ipcMain.on("color", (event, color) => {
+    _lastColor = color;
     writeColor(color);
+  });
+
+  ipcMain.on("brightness", (event, brightness) => {
+    brightness = brightness;
   });
 
   win.loadURL('http://localhost:3498');
@@ -125,8 +138,9 @@ function createTrayApp() {
       }
     },
     {
-      label: 'Audio Reactive',
+      label: "Audio Reactive",
       type: "checkbox",
+      checked: false,
       click() {
         audioReactive = !audioReactive;
       }

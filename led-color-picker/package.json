@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "color": "^4.2.3",
+    "lodash": "^4.17.21",
     "vue": "^3.4.21",
     "vue-color-wheel": "^0.1.1",
     "vue-slider-component": "4.1.0-beta.7"
