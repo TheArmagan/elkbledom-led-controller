@@ -65,10 +65,9 @@ noble.on('discover', async (p) => {
 });
 
 let audioReactive = false;
+let audioProc;
 
-const audioProc = cp.spawn(`./audio/DesktopAudioFFT.exe`, []);
-audioProc.stdout.setEncoding('utf8');
-audioProc.stdout.on('data', _.throttle((data) => {
+const onAudioData = _.throttle((data) => {
   if (audioReactive) {
     /** @type {number[]} */
     const fftData = data.trim().split(", ").map(Number);
@@ -78,7 +77,26 @@ audioProc.stdout.on('data', _.throttle((data) => {
     writeColor(Color(_lastColor).lightness(brightness).rgb().array());
     win.webContents.send("brightness", brightness);
   }
-}, 50));
+}, 50);
+
+function killAudioReactive() {
+  if (audioProc) {
+    audioProc.kill();
+    audioProc = null;
+  }
+}
+
+function setAudioReactive(v) {
+  audioReactive = v;
+  if (v) {
+    audioProc = cp.spawn(`./audio/DesktopAudioFFT.exe`, []);
+    audioProc.stdout.setEncoding('utf8');
+    audioProc.stdout.on('data', onAudioData);
+    audioProc.on('exit', killAudioReactive);
+  } else {
+    killAudioReactive();
+  }
+}
 
 function createTrayApp() {
   win = new BrowserWindow({
@@ -142,7 +160,7 @@ function createTrayApp() {
       type: "checkbox",
       checked: false,
       click() {
-        audioReactive = !audioReactive;
+        setAudioReactive(!audioReactive);
       }
     },
     {
